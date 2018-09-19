@@ -1,12 +1,16 @@
+const Message = require('mime2');
 const EventEmitter = require('events');
-const createParser = require('./parser');
+const createParser = require('../parser');
 
 const createReader = done => {
   let buffer = '';
+  const e = (c, dot) =>
+    `${c}`.split(Message.CRLF).some(x => x === dot)
   return chunk => {
-    buffer += chunk;
-    if(`${chunk}`.indexOf('.') === 0){ // "."
+    if(e(chunk, '.')){ // "."
       done(buffer);
+    }else{
+      buffer += chunk;
     }
   }
 }
@@ -18,7 +22,12 @@ class Connection extends EventEmitter {
     this.socket.on('error', err => {
       this.emit('error', err);
     });
-    this.parser = createParser((cmd, parameter) => {
+    this.parser = createParser(line => {
+      const m = line.match(/^(\S+)(?:\s+(.*))?$/);
+      if(!m) return console.warn('Invalid message', line);
+      const cmd = m[1].toUpperCase();
+      const parameter = m[2];
+      // console.log(cmd, parameter);
       this.exec(cmd, parameter);
       this.emit(cmd, parameter);
       this.emit('command', cmd, parameter);
@@ -46,12 +55,14 @@ class Connection extends EventEmitter {
         this.response(250, 'OK');
         break;
       case 'MAIL':
-        this.message.from = parameter.split(':')[1];
+        this.message.from = Message.parseAddress(
+          parameter.split(':')[1]);
         this.response(250, 'OK');
         break;
       case 'RCPT':
         (this.message['recipients'] ||
-        (this.message['recipients'] = [])).push(parameter.split(':')[1]);
+        (this.message['recipients'] = [])).push(
+          Message.parseAddress(parameter.split(':')[1]));
         this.response(250, 'OK');
         break;
       case 'DATA':
@@ -60,7 +71,7 @@ class Connection extends EventEmitter {
           this.socket.removeListener('data', reader);
           const size = Buffer.byteLength(content);
           this.response(250, `OK ${size} bytes received`);
-          this.message.content = content;
+          this.message.content = Message.parse(content);
           this.emit('message', this.message);
         });
         this.socket.on('data', reader);

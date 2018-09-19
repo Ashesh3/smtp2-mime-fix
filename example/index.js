@@ -1,8 +1,12 @@
 const smtp = require('..');
 
-smtp.send('hi@lsong.org', {
+smtp.send({
+  from: 'mail@lsong.org',
+  to: 'test@localhost',
   subject: 'hello world',
-  content: 'This is a test message, do not reply.'
+  body: {
+    _: 'This is a test message, do not reply.'
+  }
 }).then(res => {
   console.log(res);
 });
