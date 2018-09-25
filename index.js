@@ -83,10 +83,10 @@ class SMTP extends EventEmitter {
         res = yield `HELO ${from.host}`;
       }
       assert.equal(res.code, 250, res.msg);
-      res = yield `MAIL FROM:${from}`;
+      res = yield `MAIL FROM: <${from.address}>`;
       assert.equal(res.code, 250, res.msg);
       for(const rcpt of recipients){
-        res = yield `RCPT TO:${rcpt}`;
+        res = yield `RCPT TO: <${rcpt.address}>`;
         assert.equal(res.code, 250, res.msg);
       }
       res = yield 'DATA';

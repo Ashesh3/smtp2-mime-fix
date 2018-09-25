@@ -55,14 +55,16 @@ class Connection extends EventEmitter {
         this.response(250, 'OK');
         break;
       case 'MAIL':
+        const i = parameter.indexOf(':');
         this.message.from = Message.parseAddress(
-          parameter.split(':')[1]);
+          parameter.substr(i+1));
         this.response(250, 'OK');
         break;
       case 'RCPT':
+        const j = parameter.indexOf(':');
         (this.message['recipients'] ||
         (this.message['recipients'] = [])).push(
-          Message.parseAddress(parameter.split(':')[1]));
+          Message.parseAddress(parameter.substr(j+1)));
         this.response(250, 'OK');
         break;
       case 'DATA':

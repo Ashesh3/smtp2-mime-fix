@@ -1,7 +1,7 @@
 const smtp = require('..');
 
 smtp.send({
-  from: 'hi@lsong.org',
+  from: 'Liu song <hi@lsong.org>',
   to: 'song940@gmail.com',
   subject: 'hello world',
   body: {
