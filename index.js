@@ -35,6 +35,8 @@ class SMTP extends EventEmitter {
     }, options);
   }
   resolve(domain){
+    const { host } = this;
+    if(host) return Promise.resolve([ host ]);
     const resolveMx = util.promisify(dns.resolveMx);
     return resolveMx(domain)
     .catch(() => [])
@@ -74,28 +76,31 @@ class SMTP extends EventEmitter {
       .then(tryConnect);
   }
   post(host, from, recipients, body){
+    const expect = (code, res) => {
+      assert.equal(res.code, code, res.msg.join('\r\n'));
+    };
     function* process(sock){
       let res = yield;
-      assert.equal(res.code, 220, res.msg);
+      expect(220, res);
       if(/ESMTP/.test(res.msg[0])){
         res = yield `EHLO ${from.host}`;
       }else{
         res = yield `HELO ${from.host}`;
       }
-      assert.equal(res.code, 250, res.msg);
+      expect(250, res);
       res = yield `MAIL FROM: <${from.address}>`;
-      assert.equal(res.code, 250, res.msg);
+      expect(250, res);
       for(const rcpt of recipients){
         res = yield `RCPT TO: <${rcpt.address}>`;
-        assert.equal(res.code, 250, res.msg);
+        expect(250, res);
       }
       res = yield 'DATA';
-      assert.equal(res.code, 354, res.msg);
+      expect(354, res);
       sock.write(`${body}\r\n\r\n`);
       res = yield '.';
-      assert.equal(res.code, 250, res.msg);
+      expect(250, res);
       res = yield 'QUIT';
-      assert.equal(res.code, 221, res.msg);
+      expect(221, res);
       return res;
     }
     return this

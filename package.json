@@ -7,8 +7,10 @@
     "example": "example"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
+  },
+  "bin": {
+    "smtp2": "./bin/smtp.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +29,5 @@
   "homepage": "https://github.com/song940/node-smtp#readme",
   "dependencies": {
     "mime2": "latest"
-  },
-  "devDependencies": {}
+  }
 }
