@@ -28,6 +28,6 @@
   },
   "homepage": "https://github.com/song940/node-smtp#readme",
   "dependencies": {
-    "mime2": "latest"
+    "mime2": "next"
   }
 }

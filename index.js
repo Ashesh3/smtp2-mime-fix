@@ -41,6 +41,7 @@ class SMTP extends EventEmitter {
     return resolveMx(domain)
     .catch(() => [])
     .then(records => {
+      debug('MX records:', records);
       return records
         .sort((a, b) => a.priority - b. priority)
         .map(mx => mx.exchange)
@@ -96,6 +97,7 @@ class SMTP extends EventEmitter {
       }
       res = yield 'DATA';
       expect(354, res);
+      debug('send:==>\n' + body);
       sock.write(`${body}\r\n\r\n`);
       res = yield '.';
       expect(250, res);
@@ -121,28 +123,25 @@ class SMTP extends EventEmitter {
         socket.on('data', reader);
       }));
   }
-  send(message){
-    if(!(message instanceof Message))
-      message = new Message(message);
+  send(headers, body){
     const recipients = [];
+    const message = new Message(headers, body);
     if(message.to) recipients.push(message.to);
     if(message.cc) recipients.push(message.cc);
     if(message.bcc)recipients.push(message.bcc);
-    const groupByHost = recipients.reduce((groupByHost, recipient) => {
-      const addr = Message.parseAddress(recipient);
+    const groupByHost = recipients.reduce((groupByHost, addr) => {
       (groupByHost[ addr.host ] ||
       (groupByHost[ addr.host ] = [])).push(addr);
       return groupByHost;
     }, {});
-    const from = Message.parseAddress(message.from);
     return Promise.all(Object.keys(groupByHost).map(domain => 
-      this.post(domain, from, groupByHost[domain], message.toString())));
+      this.post(domain, message.from, groupByHost[domain], message.toString())));
   }
 }
 
-SMTP.send = (message, options) => {
+SMTP.send = ({ body, ...headers }, options) => {
   const smtp = new SMTP(options);
-  return smtp.send(message);
+  return smtp.send(headers, body);
 };
 
 SMTP.Server = require('./server');

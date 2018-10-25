@@ -7,11 +7,8 @@ const createReader = done => {
   const e = (c, dot) =>
     `${c}`.split(Message.CRLF).some(x => x === dot)
   return chunk => {
-    if(e(chunk, '.')){ // "."
-      done(buffer);
-    }else{
-      buffer += chunk;
-    }
+    buffer += chunk;
+    e(buffer, '.') && done(buffer);
   }
 }
 
@@ -69,6 +66,7 @@ class Connection extends EventEmitter {
         break;
       case 'DATA':
         const reader = createReader(content => {
+          // console.log(content);
           this.socket.on('data', this.parser);
           this.socket.removeListener('data', reader);
           const size = Buffer.byteLength(content);
