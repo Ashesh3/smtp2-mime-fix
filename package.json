@@ -1,6 +1,6 @@
 {
   "name": "smtp2",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "simple smtp client and server for node.js",
   "main": "index.js",
   "directories": {
@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/song940/node-smtp#readme",
   "dependencies": {
-    "mime2": "next"
-  }
+    "mime2": "latest"
+  },
+  "devDependencies": {}
 }
