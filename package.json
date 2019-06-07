@@ -1,6 +1,6 @@
 {
   "name": "smtp2-mime-fix",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "simple smtp client and server for node.js , fixes uncatchable mime header error for smtp2",
   "main": "index.js",
   "directories": {
