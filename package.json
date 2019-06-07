@@ -1,7 +1,7 @@
 {
-  "name": "smtp2",
-  "version": "0.0.5",
-  "description": "simple smtp client and server for node.js",
+  "name": "smtp2-mime-fix",
+  "version": "0.0.1",
+  "description": "simple smtp client and server for node.js , fixes uncatchable mime header error for smtp2",
   "main": "index.js",
   "directories": {
     "example": "example"
@@ -21,7 +21,7 @@
     "smtp",
     "smtp-server"
   ],
-  "author": "lsong",
+  "author": "Ashesh3",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/song940/node-smtp/issues"

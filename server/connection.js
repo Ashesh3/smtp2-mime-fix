@@ -71,7 +71,11 @@ class Connection extends EventEmitter {
           this.socket.removeListener('data', reader);
           const size = Buffer.byteLength(content);
           this.response(250, `OK ${size} bytes received`);
-          this.message.content = Message.parse(content);
+		      try {
+            this.message.content = Message.parse(content);
+          } catch (e) {
+            throw new Exception("Invalid Header!: "+e);
+          }
           this.emit('message', this.message);
         });
         this.socket.on('data', reader);
