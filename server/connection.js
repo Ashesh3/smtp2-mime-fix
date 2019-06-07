@@ -74,7 +74,7 @@ class Connection extends EventEmitter {
 		      try {
             this.message.content = Message.parse(content);
           } catch (e) {
-            throw new Exception("Invalid Header!: "+e);
+            throw new Error("Invalid Header!: "+e);
           }
           this.emit('message', this.message);
         });
