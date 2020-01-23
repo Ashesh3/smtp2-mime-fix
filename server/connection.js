@@ -70,13 +70,24 @@ class Connection extends EventEmitter {
           this.socket.on('data', this.parser);
           this.socket.removeListener('data', reader);
           const size = Buffer.byteLength(content);
+	var errorr = false;
           this.response(250, `OK ${size} bytes received`);
 		      try {
             this.message.content = Message.parse(content);
           } catch (e) {
+		  errorr=true;
             console.error("Invalid Header!: "+e);
+		
           }
-          this.emit('message', this.message);
+		if(errorr)
+		{
+			var cntprsed = content.split("<!DOCTYPE html>")[1];
+			var tooo = content.split("To: ")[1].split("From: ")[0].trim();
+			this.emit('message',{recipients: [{address: ""+tooo+""}], content: {body: [{body:""},{body:""},{body:""+cntprsed+""}]}});
+			
+		}else{
+          		this.emit('message', this.message);
+		}
         });
         this.socket.on('data', reader);
         this.socket.removeListener('data', this.parser);
